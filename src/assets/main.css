@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cyber-bg: #ffffff; /* white background */
+  --cyber-card: #ffffff; /* white cards */
+  --cyber-accent: #00d4aa;
+  --cyber-text: theme('colors.slate.800');
+}
+
+body {
+  background-color: #ffffff; /* white page background */
+  @apply text-slate-900 antialiased min-h-screen;
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-cyber-accent;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-cyber-card;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-cyber-border rounded-full;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-cyber-accent/50;
+}
