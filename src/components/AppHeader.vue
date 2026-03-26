@@ -41,6 +41,10 @@
           class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white hover:text-slate-900 hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >Industry impact</a>
         <a
+          href="#country-map"
+          class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white hover:text-slate-900 hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+        >Country mapping</a>
+        <a
           href="#explorer"
           class="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 hover:bg-white hover:text-slate-900 hover:border-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >Model explorer</a>

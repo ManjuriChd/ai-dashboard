@@ -10,6 +10,11 @@ import type { AIModel, LiveMetrics, TeamUsage } from '@/types/market'
 import type { Company, Capability } from '@/types/market'
 
 export const useMarketStore = defineStore('market', () => {
+  const adoptionBins = ref({
+    lowMax: 33,
+    mediumMax: 66,
+  })
+
   const models = ref<AIModel[]>(getInitialModels())
   const liveMetrics = ref<LiveMetrics>(getInitialMetrics())
   const teamUsage = ref<TeamUsage[]>(getInitialTeamUsage())
@@ -68,6 +73,15 @@ export const useMarketStore = defineStore('market', () => {
     filterCapability.value = capability
   }
 
+  function setAdoptionBins(lowMax: number, mediumMax: number) {
+    const safeLow = Math.max(0, Math.min(98, Math.round(lowMax)))
+    const safeMedium = Math.max(safeLow + 1, Math.min(99, Math.round(mediumMax)))
+    adoptionBins.value = {
+      lowMax: safeLow,
+      mediumMax: safeMedium,
+    }
+  }
+
   let stopStream: (() => void) | null = null
 
   function startLiveStream() {
@@ -88,6 +102,7 @@ export const useMarketStore = defineStore('market', () => {
   }
 
   return {
+    adoptionBins,
     models,
     liveMetrics,
     teamUsage,
@@ -103,6 +118,7 @@ export const useMarketStore = defineStore('market', () => {
     dismissToast,
     setFilterCompany,
     setFilterCapability,
+    setAdoptionBins,
     startLiveStream,
     stopLiveStream,
   }

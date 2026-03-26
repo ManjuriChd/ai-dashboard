@@ -6,6 +6,7 @@ import PopularModels from '@/components/PopularModels.vue'
 import UsageByTeam from '@/components/UsageByTeam.vue'
 import IndustryImpact from '@/components/IndustryImpact.vue'
 import ModelExplorer from '@/components/ModelExplorer.vue'
+import WorldMapAdoption from '@/components/WorldMapAdoption.vue'
 import NewLaunchToast from '@/components/NewLaunchToast.vue'
 import { useMarketStore } from '@/store/marketStore'
 
@@ -31,7 +32,7 @@ onUnmounted(() => {
             <UsageByTeam />
           </div>
           <div class="xl:col-span-1">
-            <!-- Company / capability filter card can sit here or in ModelExplorer -->
+            <WorldMapAdoption />
           </div>
         </div>
         <IndustryImpact />
