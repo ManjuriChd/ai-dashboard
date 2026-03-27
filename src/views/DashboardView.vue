@@ -31,7 +31,7 @@ onUnmounted(() => {
           <div class="xl:col-span-2">
             <UsageByTeam />
           </div>
-          <div class="xl:col-span-1">
+          <div class="xl:col-span-1 xl:h-full">
             <WorldMapAdoption />
           </div>
         </div>

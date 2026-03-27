@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useMarketStore } from '@/store/marketStore'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -10,6 +10,7 @@ const mapHostRef = ref<HTMLDivElement | null>(null)
 
 let map: L.Map | null = null
 let geoLayer: L.GeoJSON | null = null
+let resizeObserver: ResizeObserver | null = null
 
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n))
@@ -133,7 +134,15 @@ function onEachFeature(feature: any, layer: L.Layer) {
 async function loadGeoJsonAndRender() {
   if (!mapHostRef.value) return
 
-  map = L.map(mapHostRef.value, { zoomControl: true, scrollWheelZoom: true })
+  map = L.map(mapHostRef.value, {
+    zoomControl: true,
+    scrollWheelZoom: true,
+    worldCopyJump: true,
+    minZoom: 1,
+    maxZoom: 6,
+    maxBounds: L.latLngBounds([[-85, -180], [85, 180]]),
+    maxBoundsViscosity: 1.0,
+  })
   map.setView([20, 0], 2)
 
   // Light tiles to match your light UI.
@@ -168,8 +177,6 @@ async function loadGeoJsonAndRender() {
     style: styleFeature,
     onEachFeature,
   }).addTo(map)
-
-  map.fitBounds(geoLayer.getBounds(), { padding: [10, 10] })
 }
 
 function updateMapStyles() {
@@ -190,11 +197,38 @@ function updateMapStyles() {
   })
 }
 
+function syncMapSize() {
+  if (!map) return
+  map.invalidateSize({ pan: false, debounceMoveend: true })
+}
+
+function attachMapResizeHandlers() {
+  if (!mapHostRef.value) return
+  if (typeof ResizeObserver !== 'undefined') {
+    resizeObserver = new ResizeObserver(() => {
+      syncMapSize()
+    })
+    resizeObserver.observe(mapHostRef.value)
+  }
+  window.addEventListener('resize', syncMapSize)
+}
+
 onMounted(async () => {
   await loadGeoJsonAndRender()
+  await nextTick()
+  // Recompute after layout settles; prevents grey gaps around tile area.
+  syncMapSize()
+  requestAnimationFrame(() => syncMapSize())
+  setTimeout(() => syncMapSize(), 120)
+  attachMapResizeHandlers()
 })
 
 onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+  window.removeEventListener('resize', syncMapSize)
   if (map) map.remove()
   map = null
   geoLayer = null
@@ -217,7 +251,7 @@ watch(
 <template>
   <section
     id="country-map"
-    class="rounded-xl border border-slate-200 bg-white p-5"
+    class="relative z-0 rounded-xl border border-slate-200 bg-white p-5 h-full flex flex-col"
     aria-labelledby="country-map-heading"
   >
     <div class="flex flex-wrap items-end justify-between gap-4 mb-4">
@@ -302,7 +336,18 @@ watch(
       </div>
     </div>
 
-    <div class="h-[420px] rounded-lg overflow-hidden border border-slate-200" ref="mapHostRef" />
+    <div class="mt-1 flex-1 min-h-[420px] rounded-lg overflow-hidden border border-slate-200" ref="mapHostRef" />
   </section>
 </template>
+
+<style scoped>
+:deep(.leaflet-pane) {
+  z-index: 1;
+}
+
+:deep(.leaflet-top),
+:deep(.leaflet-bottom) {
+  z-index: 2;
+}
+</style>
 
